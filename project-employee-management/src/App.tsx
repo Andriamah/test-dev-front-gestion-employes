@@ -6,6 +6,7 @@ import FeedbackButton from "./components/feedbackButton/FeedbackButton"
 import EmployeeListe from "./pages/Employee-list"
 import { Toaster } from "sonner"
 import ProtectedRoute from "./routes/ProtectedRoute"
+import UserList from "./pages/User-list"
 
 function App() {
   return (
@@ -21,6 +22,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EmployeeListe />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/user-list"
+              element={
+                <ProtectedRoute>
+                  <UserList />
                 </ProtectedRoute>
               }
             />

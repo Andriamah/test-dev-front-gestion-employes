@@ -7,7 +7,10 @@ const Sidebar = () => {
   const menu = [
     { label: "Accueil", icon: <Home className="w-5 h-5" />, to: "/" },
     { label: "Employés", icon: <Users className="w-5 h-5" />, to: "/gestion-employes" },
+    { label: "Utilisateurs", icon: <Users className="w-5 h-5" />, to: "/user-list" },
+
     // Ajoute d'autres items si nécessaire
+    
   ]
 
   return (

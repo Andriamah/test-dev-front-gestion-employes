@@ -1,7 +1,7 @@
 // auth.service.ts
 import axios from '@/lib/axios';
 import { User } from '@/models/user';
-import { Token } from '@/models/token';
+import { AuthResponse } from '@/models/authResponse';
 
 const BASE_ENDPOINT = '/auth'
 
@@ -21,10 +21,12 @@ class AuthService {
     // Fonction pour effectuer la connexion
     async login(user: User): Promise<string> {
         try {
-            const response = await axios.post<Token>(`${BASE_ENDPOINT}/login`, user)
+            const response = await axios.post<AuthResponse>(`${BASE_ENDPOINT}/login`, user)
+            console.log("VOICI LA RESPONSE : ", response.data);  // Pour voir si token est sous response.data.token
 
             if (response.status === 200) {
-                const token = response.data.token
+                const token = response.data.data.token;
+                console.log('Token récupéré:', token);
                 localStorage.setItem('token', token)
                 return token
             } else {
