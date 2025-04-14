@@ -1,4 +1,12 @@
-# STAFFouille – Test Dev Front pour ADM Value
+# STAFFouille – Test Développement Frontend pour ADM Value
+
+Le fichier `app.jar` (backend) n’a pas pu être intégré au dépôt Git en raison de sa taille.  
+Pour exécuter l’application dans son intégralité, veuillez télécharger le projet complet (incluant le fichier JAR) à partir du lien suivant :  
+➜ [Télécharger app.jar depuis Google Drive](https://drive.google.com/file/d/1eD5vjY5dQh1jMltjW4h4qD2GxhKToKZs/view?usp=sharing)
+
+Je vous remercioe pour votre compréhension.
+
+
 
 Bienvenue sur **STAFFouille** 🕵️‍♂️ – une application de **gestion des employés** développée dans le cadre d’un test front-end pour **ADM Value**.
 
