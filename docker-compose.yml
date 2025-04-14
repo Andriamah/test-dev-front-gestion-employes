@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  back:
+    container_name: back
+    working_dir: /app
+    image: eclipse-temurin:17-jdk-alpine
+    volumes:
+      - ./app.jar:/app/app.jar
+    command: ["java", "-jar", "/app/app.jar"]
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/test
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: adm@123
+    networks:
+      - app
+
+  db:
+    container_name: db
+    image: postgres:16.6
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: v3rySstr0ngPwd
+    ports:
+      - "5435:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app
+
+  react:
+    container_name: test_react
+    build:
+      context: ./project-employee-management
+      args:
+        VITE_API_URL: http://back:8080/api
+    ports:
+      - "3000:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080/api
+    networks:
+      - app
+
+volumes:
+  db:
+
+networks:
+  app:

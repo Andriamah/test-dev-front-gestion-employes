@@ -1,0 +1,17 @@
+# Ignorer node_modules dans l'application React uniquement
+project-employee-management/node_modules/
+
+# Ne pas ignorer le fichier .jar
+# (pas besoin de l'ajouter ici si tu veux le conserver)
+*.jar
+
+# Optionnel : ignorer des fichiers générés ou des fichiers spécifiques
+# project-employee-management/build/
+# project-employee-management/.env
+
+# Ignorer les fichiers logs
+*.log
+
+# Ignorer les fichiers temporaires générés par IDE
+.vscode/
+.idea/
