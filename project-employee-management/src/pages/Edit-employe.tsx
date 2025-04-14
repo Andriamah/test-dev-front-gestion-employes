@@ -1,62 +1,96 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import EmployeService from "@/services/employe.service";
-import { Employe } from "@/models/employe";
 import { toast } from "sonner";
 import Sidebar from "@/layout/Sidebar";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Employe } from "@/models/employe";
+
+// Schéma de validation Zod
+const employeeSchema = z.object({
+  firstName: z.string().min(1, "Le prénom est requis"),
+  lastName: z.string().min(1, "Le nom est requis"),
+  dateOfBirth: z.string().refine((val) => new Date(val) <= new Date(), {
+    message: "La date de naissance ne peut pas être dans le futur",
+  }),
+  entryDate: z.string().refine((val) => new Date(val) <= new Date(), {
+    message: "La date d'entrée ne peut pas être dans le futur",
+  }),
+});
+
+type EmployeeFormData = z.infer<typeof employeeSchema>;
 
 const EditEmployeePage = () => {
   const { id } = useParams<{ id: string }>();
+  const [employee, setEmployee] = useState<Employe | null>(null);
   const navigate = useNavigate();
-  const [employee, setEmployee] = useState<Employe>({
-    firstName: "",
-    lastName: "",
-    dateOfBirth: new Date(),
-    entryDate: new Date(),
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<EmployeeFormData>({
+    resolver: zodResolver(employeeSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      dateOfBirth: "",
+      entryDate: "",
+    },
   });
 
-  // Fonction utilitaire pour sécuriser le formatage des dates
-  const formatDateForInput = (date: Date | string | undefined) => {
-    if (!date) return "";
-    const d = new Date(date);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
-  };
 
   useEffect(() => {
-    if (id) {
+    if (id && !employee) {
+      console.log("C'est un MODIF");
+
       EmployeService.getEmployee(id)
-        .then((employee) => {
-            console.log('Voici ====> ',employee)
-          setEmployee({
-            lastName: employee.lastName || "",
-            firstName: employee.firstName || "",
-            dateOfBirth: employee.dateOfBirth ? new Date(employee.dateOfBirth) : new Date(),
-            entryDate: employee.entryDate ? new Date(employee.entryDate) : new Date(),
+        .then((employeeData) => {
+          setEmployee(employeeData);
+          console.log("Données de l'employé récupérées :", employeeData);
+
+          reset({
+            firstName: employeeData.firstName,
+            lastName: employeeData.lastName,
+            dateOfBirth: new Date(employeeData.dateOfBirth).toISOString().split("T")[0],
+            entryDate: new Date(employeeData.entryDate).toISOString().split("T")[0],
           });
         })
         .catch((error) =>
           console.error("Erreur lors de la récupération de l'employé", error)
         );
     }
-  }, [id]);
+  }, [id, employee, reset]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
+
+  const onSubmit = async (data: EmployeeFormData) => {
     try {
+      const payload = {
+        ...data,
+        dateOfBirth: new Date(data.dateOfBirth),
+        entryDate: new Date(data.entryDate),
+      };
+
       if (id) {
-        await EmployeService.updateEmployee(id, employee);
+        await EmployeService.updateEmployee(id, payload);
         toast.success("Modification réussie");
       } else {
-        await EmployeService.addEmployee(employee);
+        await EmployeService.addEmployee(payload);
         toast.success("Ajout réussie");
       }
-      navigate("/gestion-employe");
-    } catch (error) {
-      toast.error("Erreur lors de la soumission des données");
-      console.error("Erreur lors de la soumission des données", error);
+
+      navigate("/gestion-employes");
+    } catch (error: any) {
+      const res = error.response?.data;
+      const generalMessage = res?.message || error.message || "Une erreur est survenue";
+      const details = res?.data
+        ? Object.values(res.data).join('\n')
+        : null;
+      toast.error(`${generalMessage}${details ? ':\n' + details : ''}`);
     }
   };
 
@@ -68,45 +102,64 @@ const EditEmployeePage = () => {
           Formulaire
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto mt-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-w-lg mx-auto mt-8">
           <h2 className="text-xl font-bold mb-4">{id ? "Modifier" : "Ajouter"} un employé</h2>
 
-          <Input
-            value={employee.firstName}
-            onChange={(e) => setEmployee({ ...employee, firstName: e.target.value })}
-            placeholder="Prénom"
-            required
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Prénom"
+              {...register("firstName")}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            {errors.firstName && (
+              <p className="text-red-500 text-sm">{errors.firstName.message}</p>
+            )}
+          </div>
 
-          <Input
-            value={employee.lastName}
-            onChange={(e) => setEmployee({ ...employee, lastName: e.target.value })}
-            placeholder="Nom"
-            required
-          />
+          <div>
+            <input
+              type="text"
+              placeholder="Nom"
+              {...register("lastName")}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            {errors.lastName && (
+              <p className="text-red-500 text-sm">{errors.lastName.message}</p>
+            )}
+          </div>
 
-          <Input
-            type="date"
-            value={formatDateForInput(employee.dateOfBirth)}
-            onChange={(e) =>
-              setEmployee({ ...employee, dateOfBirth: new Date(e.target.value) })
-            }
-            required
-          />
+          <div>
+            <input
+              type="date"
+              {...register("dateOfBirth")}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            {errors.dateOfBirth && (
+              <p className="text-red-500 text-sm">{errors.dateOfBirth.message}</p>
+            )}
+          </div>
 
-          <Input
-            type="date"
-            value={formatDateForInput(employee.entryDate)}
-            onChange={(e) =>
-              setEmployee({ ...employee, entryDate: new Date(e.target.value) })
-            }
-            required
-          />
+          <div>
+            <input
+              type="date"
+              {...register("entryDate")}
+              className="border border-gray-300 rounded px-3 py-2 w-full"
+            />
+            {errors.entryDate && (
+              <p className="text-red-500 text-sm">{errors.entryDate.message}</p>
+            )}
+          </div>
 
-          <Button type="submit" className="w-full">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded"
+          >
             {id ? "Modifier" : "Ajouter"}
-          </Button>
+          </button>
         </form>
+
+
       </div>
     </div>
   );
