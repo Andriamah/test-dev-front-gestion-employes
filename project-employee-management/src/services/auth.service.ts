@@ -2,6 +2,7 @@
 import axios from '@/lib/axios';
 import { User } from '@/models/user';
 import { AuthResponse } from '@/models/authResponse';
+import { RegisterUser } from '@/models/registerUser';
 
 const BASE_ENDPOINT = '/auth'
 
@@ -37,6 +38,20 @@ class AuthService {
         }
     }
 
+    async register(user: RegisterUser): Promise<string> {
+        try {
+          const response = await axios.post(`${BASE_ENDPOINT}/register`, user);
+          
+          if (response.status === 201) {
+            return 'Inscription réussie';
+          } else {
+            throw new Error('Échec de l\'inscription');
+          }
+        } catch (error: any) {
+          throw new Error(error?.message || 'Erreur lors de l\'inscription');
+        }
+      }
+      
     // Vérifie si l'utilisateur est authentifié
     isAuthenticated(): boolean {
         return !!localStorage.getItem("token");

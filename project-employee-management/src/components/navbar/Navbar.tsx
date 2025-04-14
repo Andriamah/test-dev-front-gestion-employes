@@ -46,7 +46,7 @@ const Navbar: React.FC = () => {
         </div>
 
         <div className="flex justify-center items-center space-x-6 text-lg">
-          <a href="#home" className="relative hover:text-gray-300">Home</a>
+          <a href="#home" className="relative hover:text-gray-300">Accueil</a>
           <a href="#about" className="relative hover:text-gray-300">À propos</a>
           <a href="#services" className="relative hover:text-gray-300">Services</a>
           <Link to="/gestion-employes" className="relative hover:text-gray-300">Gestion des Employés</Link>
