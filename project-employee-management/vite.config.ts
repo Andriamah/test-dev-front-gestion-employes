@@ -7,7 +7,12 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    react()],
+    react()
+  ],
+  server: {
+    host: '0.0.0.0',  // Permet d'écouter sur toutes les interfaces réseau
+    port: 5173         // Assure-toi que le port correspond à ce que tu as exposé
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
