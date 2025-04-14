@@ -34,4 +34,10 @@ Tout est prêt pour tester l’application en local.
 ### 2. Lancer les services
 
 ```bash
-docker-compose up --build
+docker-compose build
+docker-compose up -d
+```
+
+puis Lancer sur  : 
+  ➜  Local:   [http://localhost:3000/](http://localhost:3000/)
+  ➜  Network: [http://172.23.0.2:3000](http://172.23.0.2:3000)
